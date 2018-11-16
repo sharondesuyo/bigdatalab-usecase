@@ -1,0 +1,62 @@
+STEPS for Flafka:
+
+1) Upload csv file to /home/cloudera
+
+2) Set-up Kafka
+	Copy the config files to the /config folder
+	- connect-standalone.properties
+	- connect-file-source.properties
+	- server.properties
+
+3) Run kafka
+	bin/connect-standalone.sh config/connect-standalone.properties config/connect-file-source.properties
+	
+4) Set-up Flume Agent - save this as flafka.conf
+
+	# Sources, channels, and sinks are defined per
+	# agent name, in this case flume1.
+	flume1.sources  = kafka-source-1
+	flume1.channels = hdfs-channel-1
+	flume1.sinks    = hdfs-sink-1
+	 
+	# For each source, channel, and sink, set
+	# standard properties.
+	flume1.sources.kafka-source-1.type = org.apache.flume.source.kafka.KafkaSource
+	flume1.sources.kafka-source-1.zookeeperConnect = quickstart.cloudera:2181
+	flume1.sources.kafka-source-1.topic = flume.txn2
+	flume1.sources.kafka-source-1.batchSize = 10000
+	flume1.sources.kafka-source-1.channels = hdfs-channel-1
+	 
+	flume1.channels.hdfs-channel-1.type   = memory
+	flume1.sinks.hdfs-sink-1.channel = hdfs-channel-1
+	flume1.sinks.hdfs-sink-1.type = hdfs
+	flume1.sinks.hdfs-sink-1.hdfs.writeFormat = Text
+	flume1.sinks.hdfs-sink-1.hdfs.fileType = DataStream
+	flume1.sinks.hdfs-sink-1.hdfs.filePrefix = test-events
+	flume1.sinks.hdfs-sink-1.hdfs.useLocalTimeStamp = true
+	flume1.sinks.hdfs-sink-1.hdfs.path = /tmp/kafka/%{topic}/%y-%m-%d
+	flume1.sinks.hdfs-sink-1.hdfs.rollCount=10000
+	flume1.sinks.hdfs-sink-1.hdfs.rollSize=0
+	 
+	# Other properties are specific to each type of
+	# source, channel, or sink. In this case, we
+	# specify the capacity of the memory channel.
+	flume1.channels.hdfs-channel-1.capacity = 10000
+	flume1.channels.hdfs-channel-1.transactionCapacity = 1000
+
+5) Run Flume Agent
+	flume-ng agent -f flafka.conf --name flume1 -Dflume.root.logger=INFO,console
+   This will save the data to HDFS.
+   
+6) From Hive, we created a table that contains the entire hdfs file.
+	CREATE EXTERNAL TABLE flumetxn_tmp1 (
+		json_response STRING
+	)
+	STORED AS TEXTFILE LOCATION '/tmp/kafka/flume.txn1/18-11-15';
+   
+7) From Hive, we created a table that contains the payload from the json_response object.
+	INSERT OVERWRITE TABLE flumetxn1_proper
+	SELECT
+		get_json_object(json_response, '$.payload'),
+		json_response
+	FROM flumetxn1
