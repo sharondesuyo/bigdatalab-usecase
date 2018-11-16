@@ -1,0 +1,20 @@
+Scala file to split big file by country list
+++++++++++++++++++++++++++++++++++++++++++++
+val rdd =sc.textFile("hdfs://quickstart/user/cdhassign/data/gtd_92to11.csv").take(100)
+val country_list = rdd.map{ x=> (x.split(",")(8))}.distinct
+
+import java.io.{BufferedWriter, FileWriter,FileOutputStream}
+import java.io.{IOException, OutputStreamWriter, PrintWriter}
+
+val country_list_length = country_list.length
+var i=0
+while (i<country_list_length ) {
+val op = rdd.filter(x=>(x.split(",")(8)==country_list(i)))
+val file = country_list(i)+".txt"
+val writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file)))
+for (x <- op ) {
+writer.write(x + "\n")  // however you want to format it
+}
+writer.close()
+i += 1
+}
