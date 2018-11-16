@@ -52,14 +52,15 @@ STEPS for Flafka:
 	CREATE EXTERNAL TABLE flumetxn_tmp1 (
 		json_response STRING
 	)
-	STORED AS TEXTFILE LOCATION '/tmp/kafka/flume.txn1/18-11-15';
+	--STORED AS TEXTFILE LOCATION '/tmp/kafka/flume.txn1/18-11-15';
+   	STORED AS TEXTFILE LOCATION '/user/cloudera/data';
    
-7) From Hive, we created a table that contains the payload from the json_response object.
-	INSERT OVERWRITE TABLE flumetxn1_proper
-	SELECT
-		get_json_object(json_response, '$.payload'),
-		json_response
-	FROM flumetxn1
+--7) From Hive, we created a table that contains the payload from the json_response object.
+--	INSERT OVERWRITE TABLE flumetxn1_proper
+--	SELECT
+--		get_json_object(json_response, '$.payload'),
+--		json_response
+--	FROM flumetxn1
 
 8) Start spark shell
 	> spark-shell --master yarn-client
@@ -85,4 +86,155 @@ STEPS for Flafka:
 	i += 1
 	}
 	
-9)
+9)CREATE EXTERNAL TABLE global_terrorist(
+eventid BIGINT,
+iyear INT,
+imonth INT,
+iday INT,
+approxdate String,
+extendeddate STRING,
+resolution STRING,
+country INT,
+country_txt STRING,
+region INT,
+region_txt STRING,
+provstate STRING,
+city STRING,
+latitude STRING,
+longitude STRING,
+specificity STRING,
+vicinity STRING,
+locationplace STRING,
+summary STRING,
+crit1 STRING,
+crit2 STRING,
+crit3 STRING,
+doubtterr STRING,
+alternative STRING,
+alternative_txt STRING,
+multiple STRING,
+success STRING,
+suicide STRING,
+attacktype1 STRING,
+attacktype1_txt STRING,
+attacktype2 STRING,
+attacktype2_txt STRING,
+attacktype3 STRING,
+attacktype3_txt STRING,
+targtype1 STRING,
+targtype1_txt STRING,
+targsubtype1 STRING,
+targsubtype1_txt STRING,
+corp1 STRING,
+target1 STRING,
+natlty1 STRING,
+natlty1_txt STRING,
+targtype2 STRING,
+targtype2_txt STRING,
+targsubtype2 STRING,
+targsubtype2_txt STRING,
+corp2 STRING,
+target2 STRING,
+natlty2 STRING,
+natlty2_txt STRING,
+targtype3 STRING,
+targtype3_txt STRING,
+targsubtype3 STRING,
+targsubtype3_txt STRING,
+corp3 STRING,
+target3 STRING,
+natlty3 STRING,
+natlty3_txt STRING,
+gname STRING,
+gsubname STRING,
+gname2 STRING,
+gsubname2 STRING,
+gname3 STRING,
+ingroup STRING,
+ingroup2 STRING,
+ingroup3 STRING,
+gsubname3 STRING,
+motive STRING,
+guncertain1 STRING,
+guncertain2 STRING,
+guncertain3 STRING,
+nperps STRING,
+nperpcap STRING,
+claimed STRING,
+claimmode STRING,
+claimmode_txt STRING,
+claim2 STRING,
+claimmode2 STRING,
+claimmode2_txt STRING,
+claim3 STRING,
+claimmode3 STRING,
+claimmode3_txt STRING,
+compclaim STRING,
+weaptype1 STRING,
+weaptype1_txt STRING,
+weapsubtype1 STRING,
+weapsubtype1_txt STRING,
+weaptype2 STRING,
+weaptype2_txt STRING,
+weapsubtype2 STRING,
+weapsubtype2_txt STRING,
+weaptype3 STRING,
+weaptype3_txt STRING,
+weapsubtype3 STRING,
+weapsubtype3_txt STRING,
+weaptype4 STRING,
+weaptype4_txt STRING,
+weapsubtype4 STRING,
+weapsubtype4_txt STRING,
+weapdetail STRING,
+nkill STRING,
+nkillus STRING,
+nkillter STRING,
+nwound STRING,
+nwoundus STRING,
+nwoundte STRING,
+property STRING,
+propextent STRING,
+propextent_txt STRING,
+propvalue STRING,
+propcomment STRING,
+ishostkid STRING,
+nhostkid STRING,
+nhostkidus STRING,
+nhours STRING,
+ndays STRING,
+divert STRING,
+kidhijcountry STRING,
+ransom STRING,
+ransomamt STRING,
+ransomamtus STRING,
+ransompaid STRING,
+ransompaidus STRING,
+ransomnote STRING,
+hostkidoutcome STRING,
+hostkidoutcome_txt STRING,
+nreleased STRING,
+addnotes STRING,
+scite1 STRING,
+scite2 STRING,
+scite3 STRING,
+dbsource STRING,
+INT_LOG STRING,
+INT_IDEO STRING,
+INT_MISC STRING,
+INT_ANY STRING,
+related STRING
+)
+ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.OpenCSVSerde'
+WITH SERDEPROPERTIES 
+(
+   "separatorChar" = "\,",
+   "quoteChar"     = "\""
+)
+Stored As TEXTFILE
+LOCATION '/user/cloudera/data'
+TBLPROPERTIES ('skip.header.line.count'='1')
+
+CREATE TABLE global_terrorist_inter AS SELECT * FROM  global_terrorist;
+
+INVALIDATE METADATA;
