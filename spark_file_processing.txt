@@ -1,0 +1,9 @@
+Scala code to read csv & filter by country code
+-----------------------------------------------
+
+val rdd =sc.textFile("hdfs://quickstart/user/cdhassign/data/gtd_92to11.csv").take(1000)
+val country_list = rdd.map{ x=> (x.split(",")(8))}.distinct
+val firtst_op = rdd.filter(x=>(x.split(",")(8)==country_list(0)))
+firtst_op.foreach(println)
+val op_2 = rdd.filter(x=>(x.split(",")(8)==country_list(1)))
+val op_3 = rdd.filter(x=>(x.split(",")(8)==country_list(2)))
